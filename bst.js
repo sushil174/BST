@@ -50,61 +50,6 @@ class Tree {
 
     delete(value) {
 
-        // function deleting(ParentNode,value) {
-        //     let delNode;
-        //     if(value > ParentNode.data) delNode = ParentNode.right
-        //     else delNode = ParentNode.left
-        //     // console.log(ParentNode)
-        //     // console.log(delNode)
-        //     if(delNode.left === null && delNode.right === null) {
-        //         if(ParentNode.right.data === value) ParentNode.right = null
-        //         else ParentNode.left = null
-        //     }
-
-        //     else if((delNode.left != null && delNode.right === null) || (delNode.left === null && delNode.right != null)) {
-        //         if(delNode.left != null && delNode.right === null) {
-        //             ParentNode.left = delNode.left
-        //         } else {
-        //             ParentNode.right = delNode.right
-        //         }
-        //         // delete delNode.data
-        //         // delete delNode.right
-        //         // delete delNode.left
-        //     }
-
-        //     else if(delNode.left != null & delNode.right != null) {
-        //         // console.log(delNode)
-        //         function findCloset(root) {
-        //             let parent = root
-        //             let temp = root.right
-        //             while(temp.left != null) {
-        //                 parent = temp
-        //                 temp = temp.left
-        //             }
-        //             return {parent,temp}
-        //         }
-        //         const BiggestClosed = findCloset(delNode)
-        //         deleting(BiggestClosed.parent,BiggestClosed.temp.data)
-        //         delNode.data = BiggestClosed.temp.data
-        //     }
-        // }
-
-        // function getNode(Node,value) {
-        //     if(Node === null || (Node.left != null && Node.left.data === value) || (Node.right != null && Node.right.data === value)){
-        //         return Node
-        //     }
-        //     if(Node.data > value) return getNode(Node.left,value)
-        //     else return getNode(Node.right,value)
-        // } 
-
-        // const ParentNode = getNode(this.root,value)
-        // // if(ParentNode === null) console.log("value is not in tree")
-        // // else {
-        // //     deleting(ParentNode,value)
-        // // }
-        // deleting(ParentNode,value)
-
-
         function remove(root,value) {
             if(root === null) return root
             if(value < root.data) {
@@ -128,6 +73,128 @@ class Tree {
         remove(this.root,value)
     }
 
+    find(value) {
+        let current = this.root
+        while(current != null) {
+            if(value < current.data) current = current.left
+            else if(value > current.data) current = current.right
+            else break;
+        }
+        return current
+    }
+
+    depth(value) {
+        let current = this.root
+        let edges = 0
+        while(current != null) {
+            if(value < current.data) current = current.left
+            else if(value > current.data) current = current.right
+            else break;
+            edges += 1
+        }
+        if(current === null) return "node not in tree"
+        return edges
+    }
+
+    height(root = this.root) {
+        if(root === null) return -1
+        // let edge = 1
+        // let a = edge + this.height(root.left)
+        // let b = edge + this.height(root.right)
+        // let max = Math.max(a,b)
+        // return max 
+
+        let a = this.height(root.left)
+        let b = this.height(root.right)
+        return Math.max(a,b) + 1
+    }
+
+    isBalanced(){
+        let diff = Math.abs(this.height(this.root.left) - this.height(this.root.right))
+        return diff <= 1
+    }
+
+    levelOrder(callback) {
+        if(typeof callback != 'function') {
+            throw new Error("plz enter function");
+        }
+        const current = this.root
+        let ans = []
+        let q = []
+        q.push(current)
+        while(q.length != 0) {
+            let currentNode = q[0]
+            if(currentNode.left != null) q.push(currentNode.left)
+            if(currentNode.right != null) q.push(currentNode.right)
+            callback(currentNode)
+            q.shift()
+
+        }
+
+        // function func(q) {
+        //     if(q.length === 0) return
+        //     let currentNode = q[0]
+        //     if(currentNode.left != null) q.push(currentNode.left)
+        //     if(currentNode.right != null) q.push(currentNode.right)
+        //     console.log(currentNode.data)
+        //     q.shift()
+        //     func(q)
+        // }
+        // func([this.root])
+
+        return ans
+    }
+
+    
+    preOrder(callback) {
+        if(typeof callback != 'function') {
+            throw new Error("plz enter function");
+        }
+        let current = this.root;
+        function order(root) {
+            if(root === null) return
+            callback(root)
+            order(root.left)
+            order(root.right)
+        }
+        order(current)
+    }
+
+    inOrder(callback) {
+        if(typeof callback != 'function') {
+            throw new Error("plz enter function");
+        }
+        let current = this.root;
+        function order(root) {
+            if(root === null) return
+            order(root.left)
+            callback(root)
+            order(root.right)
+        }
+        order(current)
+    }
+
+    postOrder(callback) {
+        if(typeof callback != 'function') {
+            throw new Error("plz enter function");
+        }
+        let current = this.root;
+        function order(root) {
+            if(root === null) return
+            order(root.left)
+            order(root.right)
+            callback(root)
+        }
+        order(current)
+    }
+
+    rebalance() {
+        let arr = []
+        this.inOrder((e) => {
+            this.arr.push(e.data)
+        })
+        this.buildTree(arr)
+    }
     prettyPrint(node, prefix = "", isLeft = true) {
         if (node === null) {
           return;
@@ -143,16 +210,29 @@ class Tree {
     
 }
 
-const tree = new Tree([3,5,6,1,29,12,45,23,9])
+const tree = new Tree([1,2,3,4,5,6,7,8,9])
 const root = tree.buildTree()
 tree.prettyPrint(root)
-console.log("\n\n\nAfter insert....................\n\n\n")
-tree.insert(21)
-tree.prettyPrint(root)
-// console.log("\n\n\ndeleting...................\n\n\n")
-// tree.delete(5)
-// tree.prettyPrint(root)
+console.log(tree.height())
+console.log(tree.isBalanced())
+// console.log("\nlevelorder\n")
+// tree.levelOrder((e) => {
+//     console.log(e.data)
+// })
+// console.log("\npreorder\n")
+// tree.preOrder((e)=> {
+//     console.log(e.data)
+// })
 
+// console.log("\ninorder\n")
+// tree.inOrder((e)=> {
+//     console.log(e.data)
+// })
+
+// console.log("\npostorder\n")
+// tree.postOrder((e)=> {
+//     console.log(e.data)
+// })
 
 
 
